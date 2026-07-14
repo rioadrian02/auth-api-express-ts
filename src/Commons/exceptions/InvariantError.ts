@@ -1,7 +1,7 @@
 import ClientError from './ClientError.js';
 
 class InvariantError extends ClientError {
-    constructor(message) {
+    constructor(message: string) {
         super(message, 400);
         this.name = 'InvariantError';
     }
