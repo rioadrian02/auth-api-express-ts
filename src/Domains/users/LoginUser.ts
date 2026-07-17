@@ -1,12 +1,20 @@
+interface LoginUserPayload {
+    username: string;
+    password: string;
+}
+
 class LoginUser {
-    constructor({ username, password }) {
+    username: string;
+    password: string;
+
+    constructor({ username, password }: LoginUserPayload) {
         this._verifyPayload({ username, password });
 
         this.username = username;
         this.password = password;
     }
 
-    _verifyPayload({ username, password }) {
+    private _verifyPayload({ username, password }: LoginUserPayload) :void {
         if(!username || !password) {
             throw new Error('LOGIN_USER.MISSING_REQUIRED_PROPERTY');
         }

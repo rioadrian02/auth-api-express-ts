@@ -1,5 +1,15 @@
+interface RegisterUserPayload {
+    username: string;
+    password: string;
+    fullname: string;
+}
+
 class RegisterUser{
-    constructor({ username, password, fullname}) {
+    username: string;
+    password: string;
+    fullname: string;
+
+    constructor({ username, password, fullname}: RegisterUserPayload) {
         this._verifyPayload({ username, password, fullname});
 
         this.username = username;
@@ -7,7 +17,7 @@ class RegisterUser{
         this.fullname = fullname;
     }
 
-    _verifyPayload({ username, password, fullname}) {
+    private _verifyPayload({ username, password, fullname}: RegisterUserPayload) : void {
         if(!username || !password || !fullname) {
             throw new Error('REGISTER_USER.MISSING_REQUIRED_PROPERTY');
         }
