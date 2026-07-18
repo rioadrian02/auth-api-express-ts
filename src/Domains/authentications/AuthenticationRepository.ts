@@ -1,5 +1,5 @@
 abstract class AuthenticationRepository {
-    async addToken(token: string) :Promise<void> {
+    async addToken(token: string, userId: string) :Promise<void> {
         throw new Error('DOMAIN.AUTHENTICATION_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     }
 
