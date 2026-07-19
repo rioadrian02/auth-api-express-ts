@@ -1,3 +1,5 @@
+import { PoolClient } from "pg";
+
 abstract class AuthenticationRepository {
     async addToken(token: string, userId: string) :Promise<void> {
         throw new Error('DOMAIN.AUTHENTICATION_REPOSITORY.METHOD_NOT_IMPLEMENTED');
@@ -11,7 +13,7 @@ abstract class AuthenticationRepository {
         throw new Error('DOMAIN.AUTHENTICATION_REPOSITORY.METHOD_NOT_IMPLEMENTED')
     }
 
-    async deleteAllTokenByUserId(userId: string) :Promise<void> {
+    async deleteAllTokenByUserId(userId: string, client?: PoolClient) :Promise<void> {
         throw new Error('DOMAIN.AUTHENTICATION_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     }
 }

@@ -37,13 +37,15 @@ class AuthenticationRepositoryPostgres extends AuthenticationRepository {
         await this._pool.query(query);
     }
 
-    async deleteAllTokenByUserId(userId) {
+    async deleteAllTokenByUserId(userId, client) {
+        const db = client || this._pool;
+
         const query = {
             text: 'DELETE FROM authentications WHERE user_id = $1',
             values: [userId]
         }
 
-        await this._pool.query(query);
+        await db.query(query);
     }
 }
 
