@@ -15,8 +15,17 @@ const authenticationRepository = new AuthenticationRepositoryPostgres();
 const passwordHash = new BcryptPasswordHash();
 const tokenManager = new JwtTokenManager();
 
+type ContainerKey =
+    | 'AddUserUseCase'
+    | 'LoginUserUseCase'
+    | 'LogoutUserUseCase'
+    | 'RefreshAuthenticationUseCase'
+    | 'DetailUserUseCase'
+    | 'UpdateFullnameUseCase'
+    | 'DeleteUserUseCase';
+
 const container = {
-    getInstance(key) {
+    getInstance(key: ContainerKey) {
         switch(key) {
             case 'AddUserUseCase':
                 return new AddUserUseCase({userRepository, passwordHash});
@@ -54,3 +63,4 @@ const container = {
 }
 
 export default container;
+export type { ContainerKey };
