@@ -1,8 +1,9 @@
+import { Request, Response, NextFunction} from 'express';
 import container from "../../container.js";
 import logger from "../../logger/index.js";
 
 class AuthenticationsHandler {
-    async login(req, res, next) {
+    async login(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const loginUserUseCase = container.getInstance('LoginUserUseCase');
 
@@ -10,7 +11,7 @@ class AuthenticationsHandler {
 
             logger.info('User berhasil login', { username: req.body.username });
 
-            return res.status(201).json({
+            res.status(201).json({
                 status: 'success',
                 data: {
                     accessToken,
@@ -18,27 +19,27 @@ class AuthenticationsHandler {
                 }
             });
         } catch(error) {
-            return next(error);
+            next(error);
         }
     }
 
-    async refreshToken(req, res, next) {
+    async refreshToken(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const refreshAuthenticationUseCase = container.getInstance('RefreshAuthenticationUseCase');
 
             const { accessToken } = await refreshAuthenticationUseCase.execute(req.body);
 
-            return res.status(200).json({
+            res.status(200).json({
                 status: 'success',
                 data: { accessToken },
             });
 
         } catch (error) {
-            return next(error);
+            next(error);
         }
     }
 
-    async logout(req, res, next) {
+    async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const logoutUserUseCase = container.getInstance('LogoutUserUseCase');
 
@@ -46,13 +47,13 @@ class AuthenticationsHandler {
 
             logger.info('User berhasil logout');
 
-            return res.status(200).json({
+            res.status(200).json({
                 status: 'success',
                 message: 'Logout berhasil',
             });
 
         } catch (error) {
-            return next(error);
+            next(error);
         }
     }
 }

@@ -1,13 +1,14 @@
-import express from 'express';
+import express, { Application } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import userRoutes from './routes/users.js';
 import authenticationRoutes from './routes/authentications.js';
 import ErrorHandler from './middlewares/ErrorHandler.js';
 import { globalLimiter } from './middlewares/RateLimiter.js';
+import requestLogger from './middlewares/RequestLogger.js';
 import apiDocsMiddleware from './middlewares/ApiDocs.js';
 
-const createServer = () => {
+const createServer = (): Application => {
     const app = express();
 
     // using helmet
@@ -20,6 +21,9 @@ const createServer = () => {
     app.use(globalLimiter);
 
     app.use(express.json());
+
+    // request logger
+    app.use(requestLogger);
 
      // Dokumentasi API — hanya tampil di development
     if (process.env.NODE_ENV !== 'production') {

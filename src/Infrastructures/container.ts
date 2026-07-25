@@ -15,17 +15,19 @@ const authenticationRepository = new AuthenticationRepositoryPostgres();
 const passwordHash = new BcryptPasswordHash();
 const tokenManager = new JwtTokenManager();
 
-type ContainerKey =
-    | 'AddUserUseCase'
-    | 'LoginUserUseCase'
-    | 'LogoutUserUseCase'
-    | 'RefreshAuthenticationUseCase'
-    | 'DetailUserUseCase'
-    | 'UpdateFullnameUseCase'
-    | 'DeleteUserUseCase';
+interface Container {
+    getInstance(key: 'AddUserUseCase'): AddUserUseCase;
+    getInstance(key: 'LoginUserUseCase'): LoginUserUseCase;
+    getInstance(key: 'LogoutUserUseCase'): LogoutUserUseCase;
+    getInstance(key: 'RefreshAuthenticationUseCase'): RefreshAuthenticationUseCase;
+    getInstance(key: 'DetailUserUseCase'): DetailUserUseCase;
+    getInstance(key: 'UpdateFullnameUseCase'): UpdateFullnameUseCase;
+    getInstance(key: 'DeleteUserUseCase'): DeleteUserUseCase;
+}
 
-const container = {
-    getInstance(key: ContainerKey) {
+
+const container: Container = {
+    getInstance(key: string): any {
         switch(key) {
             case 'AddUserUseCase':
                 return new AddUserUseCase({userRepository, passwordHash});
@@ -57,10 +59,9 @@ const container = {
                 return new DeleteUserUseCase({ userRepository, authenticationRepository });
 
             default:
-                throw new Error(`Use case ${key.name} tidak ditemukan di container`);
+                throw new Error(`Use case ${key} tidak ditemukan di container`);
         }
     }
 }
 
 export default container;
-export type { ContainerKey };

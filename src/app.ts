@@ -14,11 +14,11 @@ const server = app.listen(PORT, () => {
 });
 
 // fungsi graceful shutdown
-const gracefulShutdown = (signal) => {
+const gracefulShutdown = (signal: string): void => {
     logger.info(`Menerima sinyal ${signal}, memulai graceful shutdown`);
 
     // langkah 1, hentikan server dari menerima request baru, tapi request yang sedang berjalan tetap lanjut
-    server.close((error) => {
+    server.close((error?: Error) => {
         if(error) {
             logger.error('Error saat menutup server', { error: error.message});
             process.exit(1);

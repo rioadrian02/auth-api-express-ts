@@ -1,74 +1,75 @@
+import { Request, Response, NextFunction } from "express";
 import container from "../../container.js";
 import logger from "../../logger/index.js";
 
 class UsersHandler {
-    async postUser(req, res,next) {
+    async postUser(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const addUser = container.getInstance('AddUserUseCase');
             const registeredUser = await addUser.execute(req.body);
 
             logger.info('User berhasil registrasi', { userId: registeredUser.id });
 
-            return res.status(201).json({
+            res.status(201).json({
                 status: 'success',
                 data: {
                     registeredUser
                 }
             });
         } catch (error) {
-            return next(error);
+            next(error);
         }
     }
 
-    async getUserById(req, res, next) {
+    async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const detailUserUseCase = container.getInstance('DetailUserUseCase');
 
-            const user = await detailUserUseCase.execute(req.params);
+            const user = await detailUserUseCase.execute(req.params as {id: string});
 
-            return res.status(200).json({
+            res.status(200).json({
                 status: 'success',
                 data: {
                     user
                 }
             });
         } catch (error) {
-            return next(error);
+            next(error);
         }
     }
 
-    async updateFullname(req, res, next) {
+    async updateFullname(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const updateFullnameUseCase = container.getInstance('UpdateFullnameUseCase');
 
-            const user = await updateFullnameUseCase.execute(req.body, req.params);
+            const user = await updateFullnameUseCase.execute(req.body, req.params as {id: string});
 
             logger.info('User berhasil udpate username', { userId: user.id });
 
-            return res.status(200).json({
+            res.status(200).json({
                 status: 'success',
                 data: {
                     user
                 }
             });
         } catch(error) {
-            return next(error);
+            next(error);
         }
     }
 
-    async deleteUser(req, res, next) {
+    async deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const deleteUserUseCase = container.getInstance('DeleteUserUseCase');
 
-            await deleteUserUseCase.execute({ userId: req.params.id});
+            await deleteUserUseCase.execute({ userId: req.params.id as string});
 
             logger.info('User berhasil dihapus', { userId: req.params.id });
-            return res.status(200).json({
+            res.status(200).json({
                 status: 'success',
                 message: 'User berhasil dihapus'
             });
         } catch(error) {
-            return next(error);
+            next(error);
         }
     }
 }
