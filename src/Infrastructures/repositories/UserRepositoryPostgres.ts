@@ -1,18 +1,20 @@
 import { nanoid } from "nanoid";
-import pkg from 'pg';
+import pkg, { PoolClient } from 'pg';
 const { Pool } = pkg;
-import UserRepository from "../../Domains/users/UserRepository.js";
+import UserRepository, {IRegisteredUser, IRegisterUser, IUser} from "../../Domains/users/UserRepository.js";
 import RegisteredUser from "../../Domains/users/RegisteredUser.js";
 import InvariantError from "../../Commons/exceptions/InvariantError.js";
 import NotFoundError from "../../Commons/exceptions/NotFoundError.js";
 
 class UserRepositoryPostgres extends UserRepository {
+    private _pool: InstanceType<typeof Pool>
+
     constructor() {
         super();
         this._pool = new Pool();
     }
 
-    async verifyAvailableUsername(username) {
+    async verifyAvailableUsername(username: string): Promise<void> {
         const query = {
             text: 'SELECT id FROM users WHERE username = $1',
             values: [username]
@@ -25,7 +27,7 @@ class UserRepositoryPostgres extends UserRepository {
         }
     }
 
-    async addUser({username, password, fullname}) {
+    async addUser({username, password, fullname} : IRegisterUser): Promise<IRegisteredUser> {
         const id = `user-${nanoid(16)}`;
         const createdAt = new Date().toISOString();
 
@@ -39,7 +41,7 @@ class UserRepositoryPostgres extends UserRepository {
         return new RegisteredUser(result.rows[0]);
     }
 
-    async getPasswordByUsername(username) {
+    async getPasswordByUsername(username: string) :Promise<string> {
         const query = {
             text: 'SELECT password FROM users WHERE username=$1',
             values: [username]
@@ -54,7 +56,7 @@ class UserRepositoryPostgres extends UserRepository {
         return result.rows[0].password;
     }
 
-    async getIdByUsername(username) {
+    async getIdByUsername(username: string): Promise<string> {
         const query = {
             text: 'SELECT id FROM users WHERE username=$1',
             values: [username]
@@ -69,7 +71,7 @@ class UserRepositoryPostgres extends UserRepository {
         return result.rows[0].id;
     }
 
-    async getUserById(id) {
+    async getUserById(id: string): Promise<IUser> {
         const query = {
             text: 'SELECT id, username, fullname FROM users WHERE id=$1',
             values: [id]
@@ -84,7 +86,7 @@ class UserRepositoryPostgres extends UserRepository {
         return result.rows[0];
     }
 
-    async updateFullnameById(id, fullname) {
+    async updateFullnameById(id: string, fullname: string): Promise<IUser>{
         const query = {
             text: 'UPDATE users SET fullname = $1 WHERE id = $2 RETURNING id,username,fullname',
             values: [fullname, id]
@@ -99,8 +101,8 @@ class UserRepositoryPostgres extends UserRepository {
         return result.rows[0];
     }
 
-    async deleteUser(id, client) {
-        const db = client || this._pool;
+    async deleteUser(id: string, client?: PoolClient): Promise<void> {
+        const db = client ?? this._pool;
 
         const query = {
             text: 'DELETE FROM users WHERE id=$1 RETURNING id',
@@ -112,8 +114,6 @@ class UserRepositoryPostgres extends UserRepository {
         if(!result.rows[0]) {
             throw new NotFoundError('User tidak ditemukan');
         }
-
-        return result.rows[0];
     }
 }
 

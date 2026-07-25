@@ -1,15 +1,17 @@
-import pkg from 'pg';
+import pkg, { PoolClient } from 'pg';
 const  { Pool } = pkg;
 import AuthenticationRepository from '../../Domains/authentications/AuthenticationRepository.js';
 import InvariantError from '../../Commons/exceptions/InvariantError.js';
 
 class AuthenticationRepositoryPostgres extends AuthenticationRepository {
+    private _pool: InstanceType<typeof Pool>
+
     constructor() {
         super();
         this._pool = new Pool();
     }
 
-    async addToken(token, userId) {
+    async addToken(token: string, userId: string): Promise<void> {
         const query = {
             text: 'INSERT INTO authentications(token, user_id) VALUES($1, $2)',
             values: [token, userId],
@@ -17,7 +19,7 @@ class AuthenticationRepositoryPostgres extends AuthenticationRepository {
         await this._pool.query(query);
     }
 
-    async checkAvailabilityToken(token) {
+    async checkAvailabilityToken(token: string) : Promise<void> {
         const query = {
             text: 'SELECT token FROM authentications WHERE token = $1',
             values: [token],
@@ -29,7 +31,7 @@ class AuthenticationRepositoryPostgres extends AuthenticationRepository {
         }
     }
 
-    async deleteToken(token) {
+    async deleteToken(token: string): Promise<void> {
         const query = {
             text: 'DELETE FROM authentications WHERE token = $1',
             values: [token],
@@ -37,7 +39,7 @@ class AuthenticationRepositoryPostgres extends AuthenticationRepository {
         await this._pool.query(query);
     }
 
-    async deleteAllTokenByUserId(userId, client) {
+    async deleteAllTokenByUserId(userId: string, client?: PoolClient): Promise<void> {
         const db = client || this._pool;
 
         const query = {
