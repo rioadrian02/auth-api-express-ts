@@ -1,5 +1,7 @@
 import { jest } from '@jest/globals';
 import RefreshAuthenticationUseCase from '../use_case/RefreshAuthenticationUseCase.js';
+import AuthenticationRepository from '../../Domains/authentications/AuthenticationRepository.js';
+import TokenManager, { TokenPayload } from '../../Domains/authentications/TokenManager.js';
 
 describe('RefreshAuthenticationUseCase', () => {
     test('harus mengembalikan acces token kalau berhasil', async () => {
@@ -8,14 +10,14 @@ describe('RefreshAuthenticationUseCase', () => {
         }
 
         const mockAuthenticationRepository = {
-            checkAvailabilityToken: jest.fn().mockResolvedValue()
-        }
+            checkAvailabilityToken: jest.fn<() => Promise<void>>().mockResolvedValue()
+        } as unknown as AuthenticationRepository;
 
         const mockTokenManager = {
-            verifyRefreshToken: jest.fn().mockResolvedValue(),
-            decodePayload: jest.fn().mockResolvedValue({userId: 'user-123', username: 'username123'}),
-            createAccessToken: jest.fn().mockResolvedValue('access_token_123')
-        }
+            verifyRefreshToken: jest.fn<() => Promise<void>>().mockResolvedValue(),
+            decodePayload: jest.fn<() => Promise<TokenPayload>>().mockResolvedValue({userId: 'user-123', username: 'username123'}),
+            createAccessToken: jest.fn<() => Promise<string>>().mockResolvedValue('access_token_123')
+        } as unknown as TokenManager;
 
         const refreshAuthenticationUseCase = new RefreshAuthenticationUseCase({
             authenticationRepository: mockAuthenticationRepository,

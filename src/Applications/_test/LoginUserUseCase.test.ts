@@ -1,5 +1,9 @@
 import { jest } from '@jest/globals';
 import LoginUserUseCase from '../use_case/LoginUserUseCase.js';
+import UserRepository from '../../Domains/users/UserRepository.js';
+import { PasswordHash } from '../use_case/AddUserUseCase.js';
+import TokenManager from '../../Domains/authentications/TokenManager.js';
+import AuthenticationRepository from '../../Domains/authentications/AuthenticationRepository.js';
 
 describe('LoginUserUseCase', () => {
     test('harus berhasil login dan mengembalikan access token dan refresh token', async () => {
@@ -9,22 +13,22 @@ describe('LoginUserUseCase', () => {
         }
 
         const mockUserRepository = {
-            getPasswordByUsername: jest.fn().mockResolvedValue('hashed_password'),
-            getIdByUsername: jest.fn().mockResolvedValue('user-123'),
-        }
+            getPasswordByUsername: jest.fn<() => Promise<string>>().mockResolvedValue('hashed_password'),
+            getIdByUsername: jest.fn<() => Promise<string>>().mockResolvedValue('user-123'),
+        } as unknown as UserRepository;
 
         const mockPasswordHash = {
-            comparePassword: jest.fn().mockResolvedValue(true)
-        }
+            comparePassword: jest.fn<() => Promise<boolean>>().mockResolvedValue(true)
+        } as unknown as PasswordHash
 
         const mockTokenManager = {
-            createAccessToken: jest.fn().mockResolvedValue('access_token_123'),
-            createRefreshToken:jest.fn().mockResolvedValue('refresh_token_123'),
-        }
+            createAccessToken: jest.fn<() => Promise<string>>().mockResolvedValue('access_token_123'),
+            createRefreshToken: jest.fn<() => Promise<string>>().mockResolvedValue('refresh_token_123'),
+        } as unknown as TokenManager;
 
         const mockAuthenticationRepository = {
-            addToken: jest.fn().mockResolvedValue()
-        }
+            addToken: jest.fn<() => Promise<void>>().mockResolvedValue(undefined)
+        } as unknown as AuthenticationRepository;
 
         const loginUserUseCase = new LoginUserUseCase({
             userRepository: mockUserRepository,
@@ -66,22 +70,22 @@ describe('LoginUserUseCase', () => {
         }
 
         const mockUserRepository = {
-            getPasswordByUsername: jest.fn().mockResolvedValue('hashed_password'),
+            getPasswordByUsername: jest.fn<() => Promise<string>>().mockResolvedValue('hashed_password'),
             getIdByUsername: jest.fn()
-        }
+        } as unknown as UserRepository;
 
         const mockPasswordHash = {
-            comparePassword: jest.fn().mockResolvedValue(false),
-        }
+            comparePassword: jest.fn<() => Promise<boolean>>().mockResolvedValue(false),
+        } as unknown as PasswordHash;
 
         const mockTokenManager = {
             createAccessToken: jest.fn(),
             createRefreshToken: jest.fn(),
-        }
+        } as unknown as TokenManager;
 
         const mockAuthenticationRepository = {
             addToken: jest.fn()
-        }
+        } as unknown as AuthenticationRepository;
 
         const loginUserUseCase = new LoginUserUseCase({
             userRepository: mockUserRepository,
@@ -91,7 +95,7 @@ describe('LoginUserUseCase', () => {
         });
 
 
-        expect(loginUserUseCase.execute(useCasePayload)).rejects.toThrow('LOGIN_USER.WRONG_PASSWORD');
+        await expect(loginUserUseCase.execute(useCasePayload)).rejects.toThrow('LOGIN_USER.WRONG_PASSWORD');
 
         expect(mockUserRepository.getIdByUsername).not.toHaveBeenCalled();
         expect(mockTokenManager.createAccessToken).not.toHaveBeenCalled();

@@ -35,7 +35,7 @@ if(cluster.isPrimary) {
     });
 
     // Graceful shutdown untuk setiap worker
-    const gracefulShutdown = (signal) => {
+    const gracefulShutdown = (signal: string) => {
         logger.info(`Worker ${process.pid} menerima ${signal}, shutdown...`);
 
         server.close(() => {

@@ -1,4 +1,4 @@
-interface RegisteredUserPayload {
+export interface RegisteredUserPayload {
     id: string;
     username: string;
     fullname: string;

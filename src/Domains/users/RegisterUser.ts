@@ -1,4 +1,4 @@
-interface RegisterUserPayload {
+export interface RegisterUserPayload {
     username: string;
     password: string;
     fullname: string;

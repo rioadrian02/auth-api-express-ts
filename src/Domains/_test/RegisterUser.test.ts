@@ -1,17 +1,17 @@
 import { jest } from '@jest/globals';
-import RegisterUser from '../users/RegisterUser';
+import RegisterUser, { RegisterUserPayload } from '../users/RegisterUser.js';
 
 describe('RegsiterUser', () => {
     test('harus error jika property tidak lengkap', () => {
         expect(()=> new RegisterUser({
             username: 'user',
             password: 'password123'
-        })).toThrow('REGISTER_USER.MISSING_REQUIRED_PROPERTY');
+        } as RegisterUserPayload)).toThrow('REGISTER_USER.MISSING_REQUIRED_PROPERTY');
     });
 
     test('harus error jika tipe data tidak sesuai', () => {
         expect(()=> new RegisterUser({
-            username: 123,
+            username: 123 as unknown as string,
             password: 'password123',
             fullname: 'Jhonson'
         })).toThrow('REGISTER_USER.WRONG_DATA_TYPE');

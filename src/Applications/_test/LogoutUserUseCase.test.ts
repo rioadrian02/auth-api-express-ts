@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import LogoutUserUseCase from '../use_case/LogoutUserUseCase.js';
+import AuthenticationRepository from '../../Domains/authentications/AuthenticationRepository.js';
 
 describe('LogoutUserUseCase', () => {
     test('harus berhasil logout dengan menghapus refresh token', async () => {
@@ -10,7 +11,7 @@ describe('LogoutUserUseCase', () => {
         const mockAuthenticationRepository = {
             checkAvailabilityToken: jest.fn(),
             deleteToken: jest.fn()
-        }
+        } as unknown as AuthenticationRepository;
 
         const logoutUserUseCase = new LogoutUserUseCase({
             authenticationRepository: mockAuthenticationRepository
@@ -24,9 +25,9 @@ describe('LogoutUserUseCase', () => {
 
     test('harus error jika token tidak ditemukan', async () => {
         const mockAuthenticationRepository = { 
-            checkAvailabilityToken: jest.fn().mockRejectedValue(new Error('Refresh token tidak ditemukan di database')),
+            checkAvailabilityToken: jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Refresh token tidak ditemukan di database')),
             deleteToken: jest.fn()
-        }
+        } as unknown as AuthenticationRepository;
 
         const logoutUserUseCase = new LogoutUserUseCase({
             authenticationRepository: mockAuthenticationRepository,
@@ -39,8 +40,5 @@ describe('LogoutUserUseCase', () => {
         await expect(logoutUserUseCase.execute(useCasePayload)).rejects.toThrow('Refresh token tidak ditemukan di database');
 
         expect(mockAuthenticationRepository.deleteToken).not.toHaveBeenCalled();
-
-
-        
     });
 });

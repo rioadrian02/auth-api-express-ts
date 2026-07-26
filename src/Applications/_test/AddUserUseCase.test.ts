@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
-import AddUserUseCase from '../use_case/AddUserUseCase.js';
+import AddUserUseCase, { PasswordHash } from '../use_case/AddUserUseCase.js';
+import UserRepository, { IRegisteredUser } from '../../Domains/users/UserRepository.js';
 
 describe ('AddUserUseCase', () => {
     
@@ -11,20 +12,20 @@ describe ('AddUserUseCase', () => {
             fullname: 'Budi Santoso'
         }
 
-        const expectedRegisteredUser = {
+        const expectedRegisteredUser: IRegisteredUser = {
             id: 'user-123',
             username: 'budi',
             fullname: 'Budi Santoso'
         }
 
         const mockUserRepository = {
-            verifyAvailableUsername: jest.fn().mockResolvedValue(),
-            addUser: jest.fn().mockResolvedValue(expectedRegisteredUser)
-        }
+            verifyAvailableUsername: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
+            addUser: jest.fn<() => Promise<IRegisteredUser>>().mockResolvedValue(expectedRegisteredUser)
+        } as unknown as UserRepository;
 
         const mockPasswordHash = {
-            hash: jest.fn().mockResolvedValue('hashed_password')
-        }
+            hash: jest.fn<() => Promise<string>>().mockResolvedValue('hashed_password')
+        } as unknown as PasswordHash
 
         const addUserUseCase = new AddUserUseCase({
             userRepository: mockUserRepository,
@@ -51,13 +52,13 @@ describe ('AddUserUseCase', () => {
 
     test('harus error jika username sudah digunakan', async () => {
         const mockUserRepository = {
-            verifyAvailableUsername: jest.fn().mockRejectedValue(new Error('Username sudah digunakan')),
+            verifyAvailableUsername: jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Username sudah digunakan')),
             addUser: jest.fn()
-        }
+        } as unknown as UserRepository;
 
         const mockPasswordHash = {
             hash: jest.fn(),
-        }
+        } as unknown as PasswordHash;
 
         const addUserUseCase = new AddUserUseCase({
             userRepository: mockUserRepository,

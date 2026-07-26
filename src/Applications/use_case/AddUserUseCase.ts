@@ -12,7 +12,7 @@ interface AddUserUseCaseDependencies {
     passwordHash: PasswordHash;
 }
 
-interface IUseCasePayload {
+export interface IUseCasePayload {
     username: string;
     password: string;
     fullname: string;
