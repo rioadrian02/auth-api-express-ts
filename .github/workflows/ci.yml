@@ -1,6 +1,5 @@
 name: CI
 
-# Jalankan workflow ini setiap kali ada push atau pull request ke branch main
 on:
   push:
     branches: [main]
@@ -9,10 +8,8 @@ on:
 
 jobs:
   test:
-    # Jalankan di Ubuntu
     runs-on: ubuntu-latest
 
-    # setup postgreSQL sebagai service
     services:
       postgres:
         image: postgres:15
@@ -21,8 +18,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: authapi_test
         ports:
-          - 5432:5432
-        # Tunggu sampai postgreSQL siap
+          - "5432:5432"
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -30,27 +26,23 @@ jobs:
           --health-retries 5
 
     steps:
-      # checkout kode dari repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          cache: "npm"
+          node-version: 20
+          cache: npm
 
-      # install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Buat tabel di database test
       - name: Setup database
         run: |
           PGPASSWORD=postgres psql -h localhost -U postgres -d authapi_test -c "CREATE TABLE IF NOT EXISTS users (id VARCHAR(50) PRIMARY KEY, username VARCHAR(50) UNIQUE NOT NULL, password TEXT NOT NULL, fullname TEXT NOT NULL, created_at TEXT NOT NULL);"
           PGPASSWORD=postgres psql -h localhost -U postgres -d authapi_test -c "CREATE TABLE IF NOT EXISTS authentications (token TEXT NOT NULL, user_id VARCHAR(50));"
-      # Jalankan test
+
       - name: Run tests
         env:
           PGHOST: localhost
